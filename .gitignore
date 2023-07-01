@@ -1,0 +1,23 @@
+# Dependency directory
+node_modules
+
+# Build directory
+build/
+
+# Environment variables
+.env
+
+# System files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.idea/
+*.iml
+
+# Log files
+npm-debug.log
+yarn-error.log
+
+# Directory for deployed contracts, not needed in version control
+deployed/

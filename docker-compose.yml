@@ -1,0 +1,14 @@
+version: '3'
+services:
+  ganache:
+    image: trufflesuite/ganache-cli
+    ports:
+      - "8545:8545"
+
+  txoco:
+    build: .
+    volumes:
+      - .:/app
+    command: /bin/sh
+    depends_on:
+      - ganache
