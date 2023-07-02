@@ -31,6 +31,26 @@ contract("TxocoCalPadri", accounts => {
         assert.equal(isAdmin, true, "Failed to set new administrator");
     });
 
+    it("should initialize with correct base URI", async () => {
+        const baseURI = await contract.uri(0);
+        assert.equal(baseURI, 'https://ipfs.io/ipfs/QmNkgQe8meF31ZZ7fZ3rAvSEYtjnfxtWgiXgh7Xte7ack3', "Failed to initialize with correct base URI");
+    });
+
+    it("should allow owner to change base URI", async () => {
+        const newBaseURI = 'https://newbaseuri.example.com/';
+        await contract.setBaseURI(newBaseURI, { from: owner });
+        const baseURI = await contract.uri(0);
+        assert.equal(baseURI, newBaseURI, "Failed to set new base URI");
+    });
+
+    it("should not allow non-owner to change base URI", async () => {
+        const anotherBaseURI = 'https://anotherbaseuri.example.com/';
+        await truffleAssert.reverts(
+            contract.setBaseURI(anotherBaseURI, { from: admin }),
+            "Ownable: caller is not the owner"
+        );
+    });
+
     it("should mint NFT to a member", async () => {
         await contract.mintNFT(member, { from: admin });
         const balance = await contract.balanceOf(member, 0);
