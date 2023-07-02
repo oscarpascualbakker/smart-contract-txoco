@@ -23,6 +23,7 @@ contract TxocoCalPadri is ERC1155, Ownable {
     mapping(uint256 => string) private _tokenURIs;
     uint256 public proposalCount = 0;
     uint256 public activeProposalCount = 0;
+    string public baseURI;
 
     event ProposalCreated(uint256 proposalId, string title, uint256 startTime, uint256 endTime);
     event Voted(uint256 proposalId, address voter, uint256 selectedOption);
@@ -34,10 +35,21 @@ contract TxocoCalPadri is ERC1155, Ownable {
         _;
     }
 
-
-    constructor() ERC1155("") {
+    constructor(string memory _baseURI) ERC1155(_baseURI) {
         administrators[msg.sender] = true; // The contract deployer is the first administrator
-        _setURI("https://ipfs.io/ipfs/QmZkJQsaQ65TBDwhhaj6vUy47EiJWUeK6v6e2yzRrmCEz7");
+        setBaseURI(_baseURI);
+    }
+
+
+    function setBaseURI(string memory _baseURI) public onlyOwner {
+        baseURI = _baseURI;
+        _setURI(_baseURI);
+    }
+
+
+    function uri(uint256 tokenId) public view override returns (string memory) {
+        // Ignore tokenId, as it is not needed in this contract
+        return baseURI;
     }
 
 
