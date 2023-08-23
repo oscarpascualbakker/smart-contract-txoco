@@ -1,5 +1,5 @@
-const HDWalletProvider = require('@truffle/hdwallet-provider');
 require('dotenv').config();
+const HDWalletProvider = require('@truffle/hdwallet-provider');
 
 module.exports = {
   networks: {
@@ -15,11 +15,32 @@ module.exports = {
       timeoutBlocks: 200,
       skipDryRun: true
     },
+    polygon_mainnet: {
+      provider: () => new HDWalletProvider(process.env.PRIVATE_KEY_POLYGON, process.env.API_URL_POLYGON),
+      network_id: 137,
+      confirmations: 4,
+      timeoutBlocks: 300,
+      skipDryRun: true,
+      gasPrice: 140000000000,
+      gas: 6721975
+    }
   },
   compilers: {
     solc: {
       version: "0.8.1",
+      settings: {
+        optimizer: {
+          enabled: true,
+          runs: 100
+        }
+      }
     },
   },
-  contracts_build_directory: '/app/build/contracts',
+  plugins: [
+    'truffle-plugin-verify'
+  ],
+  api_keys: {
+    polygonscan: process.env.POLYGONSCAN_API_KEY
+  },
+  contracts_build_directory: './build/contracts',
 };

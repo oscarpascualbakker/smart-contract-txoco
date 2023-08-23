@@ -9,6 +9,7 @@ services:
     build: .
     volumes:
       - .:/app
+      - /app/node_modules
     command: /bin/sh
     depends_on:
       - ganache

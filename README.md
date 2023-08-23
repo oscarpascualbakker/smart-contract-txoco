@@ -14,6 +14,10 @@ TxocoCalPadri is a smart contract written in Solidity for the Ethereum Virtual M
 
 ## Functions
 
+##### `setBaseURI(string memory baseURI)`
+
+Allows the contract owner to set the URI for the token metadata.
+
 ##### `setAdministrator(address _admin, bool _status)`
 
 Allows the contract owner to add or remove administrators. Set `_status` to true to add, and false to remove.
@@ -52,12 +56,28 @@ Returns the index, name, and vote count of the winning option for a specific pro
 - `Voted`
 - `NFTMinted`
 
+
+## Overridden Functions
+This contract overrides the following functions from its inherited contracts to adapt their behavior for the specific requirements of this contract:
+
+##### `uri(uint256 tokenId) -> string`
+
+This function overrides the uri function from the ERC1155 contract. It is used to get the URI for a token's metadata. However, in this contract, it ignores the tokenId parameter and returns the base URI for all tokens.
+
+##### `safeTransferFrom(address _from, address _to, uint256 _id, uint256 _value, bytes memory _data)`
+
+This function overrides the safeTransferFrom function from the ERC1155 contract. It is used to safely transfer tokens from one address to another. In this contract, the function has been modified to only allow administrators to transfer tokens.
+
+##### `safeBatchTransferFrom(address _from, address _to, uint256[] memory _ids, uint256[] memory _values, bytes memory _data)`
+
+This function overrides the safeBatchTransferFrom function from the ERC1155 contract. It is used to perform a batch transfer of multiple tokens from one address to another. In this contract, the function has been modified to only allow administrators to transfer tokens.
+
 ## Testing
 
 1. Clone this repository.
 2. Navigate to the project folder and run `docker-compose build --no-cache`.
 3. Run the containers using `docker-compose up -d`.
-4. Compile and run tests using the following command: `docker-compose run txoco truffle test`.
+4. Compile and run tests using the following command: `docker-compose run --rm txoco truffle test`.
 
 #### Expected result:
 ![Resultado de los tests](https://oscarpascual.com/test-results-txococalpadri.jpg)

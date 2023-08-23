@@ -32,8 +32,11 @@ contract("TxocoCalPadri", accounts => {
     });
 
     it("should initialize with correct base URI", async () => {
-        const baseURI = await contract.uri(0);
-        assert.equal(baseURI, 'https://ipfs.io/ipfs/QmNkgQe8meF31ZZ7fZ3rAvSEYtjnfxtWgiXgh7Xte7ack3', "Failed to initialize with correct base URI");
+        const tokenId = 0;
+        const fullURI = await contract.uri(tokenId);
+        const baseURI = 'https://oscarpascual.com/txococalpadri/metadata.json';
+
+        assert.include(fullURI, baseURI, "Failed to initialize with correct base URI");
     });
 
     it("should allow owner to change base URI", async () => {
@@ -47,7 +50,7 @@ contract("TxocoCalPadri", accounts => {
         const anotherBaseURI = 'https://anotherbaseuri.example.com/';
         await truffleAssert.reverts(
             contract.setBaseURI(anotherBaseURI, { from: admin }),
-            "Ownable: caller is not the owner"
+            "You are not the owner"
         );
     });
 
