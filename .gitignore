@@ -24,3 +24,7 @@ yarn-error.log
 
 # Directory for deployed contracts, not needed in version control
 deployed/
+
+# Cache & Artifacts
+cache/
+artifacts/

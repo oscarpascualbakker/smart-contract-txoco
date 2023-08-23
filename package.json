@@ -1,14 +1,10 @@
 {
-  "name": "txoco_cal_padri",
-  "version": "1.0.0",
   "dependencies": {
-    "@openzeppelin/contracts": "^4.0.0",
-    "@truffle/hdwallet-provider": "^2.1.12",
-    "dotenv": "^16.3.1"
-  },
-  "devDependencies": {
+    "@openzeppelin/contracts": "^4.9.3",
+    "@truffle/hdwallet-provider": "^2.1.13",
     "chai": "^4.3.7",
-    "check-dependencies": "^1.1.0",
-    "truffle-assertions": "^0.9.2"
+    "dotenv": "^16.3.1",
+    "truffle-assertions": "^0.9.2",
+    "truffle-plugin-verify": "^0.6.5"
   }
 }

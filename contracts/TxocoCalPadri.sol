@@ -2,10 +2,11 @@
 pragma solidity >=0.8.0 <0.9.0;
 
 import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
 
 
-contract TxocoCalPadri is ERC1155, Ownable {
+contract TxocoCalPadri is ERC1155 {
+
+    address public owner;
 
     struct Proposal {
         string title;
@@ -30,23 +31,43 @@ contract TxocoCalPadri is ERC1155, Ownable {
     event NFTMinted(address to);
 
 
+    modifier onlyOwner() {
+        require(msg.sender == owner, "You are not the owner");
+        _;
+    }
+
     modifier onlyAdministrator() {
         require(administrators[msg.sender], "You are not an administrator");
         _;
     }
 
-    constructor(string memory _baseURI) ERC1155(_baseURI) {
+
+    /**
+     * @notice Initializes the contract and sets the base URI for tokens.
+     */
+    constructor() ERC1155("") {
+        owner = msg.sender;
         administrators[msg.sender] = true; // The contract deployer is the first administrator
-        setBaseURI(_baseURI);
+        baseURI = "https://oscarpascual.com/txococalpadri/metadata.json";
+        _setURI(baseURI);
     }
 
 
+    /**
+     * @notice Allows the owner to set the base URI.
+     * @param _baseURI The new base URI to be set.
+     */
     function setBaseURI(string memory _baseURI) public onlyOwner {
         baseURI = _baseURI;
         _setURI(_baseURI);
     }
 
 
+    /**
+     * @notice Overrides the uri function from ERC1155 to return the base URI for all tokens.
+     * @param tokenId The ID of the token.
+     * @return The base URI string.
+     */
     function uri(uint256 tokenId) public view override returns (string memory) {
         // Ignore tokenId, as it is not needed in this contract
         return baseURI;
@@ -54,7 +75,9 @@ contract TxocoCalPadri is ERC1155, Ownable {
 
 
     /**
-     * Set or unset administrators.
+     * @notice Set or unset an address as an administrator.
+     * @param _admin The address to be set or unset as administrator.
+     * @param _status The status to set, true for set and false for unset.
      */
     function setAdministrator(address _admin, bool _status) external onlyOwner {
         administrators[_admin] = _status;
@@ -62,7 +85,8 @@ contract TxocoCalPadri is ERC1155, Ownable {
 
 
     /**
-     * In this smart contract you can only have 1 NFT.
+     * @notice Mints a new NFT to the specified address.  Members can only have one.
+     * @param _to The address to mint the NFT to.
      */
     function mintNFT(address _to) external onlyAdministrator {
         require(balanceOf(_to, 0) == 0, "Address already owns the NFT");
@@ -72,8 +96,8 @@ contract TxocoCalPadri is ERC1155, Ownable {
 
 
     /**
-     * NFTs can also be revoked in this smart contract. When you are no longer a member of
-     * the association, your NFT is burned.
+     * @notice Burns the NFT from the specified address.  Non-members can't hold the NFT.
+     * @param _from The address to burn the NFT from.
      */
     function revokeNFT(address _from) external onlyAdministrator {
         require(balanceOf(_from, 0) > 0, "Address does not own the NFT");
@@ -81,6 +105,14 @@ contract TxocoCalPadri is ERC1155, Ownable {
     }
 
 
+    /**
+     * @notice Allows an administrator to create a new proposal.
+     * @param _title The title of the proposal.
+     * @param _description The description of the proposal.
+     * @param _options The options for the proposal.
+     * @param _startTime The start time of the proposal.
+     * @param _endTime The end time of the proposal.
+     */
     function createProposal(string memory _title, string memory _description, string[] memory _options, uint256 _startTime, uint256 _endTime) external onlyAdministrator {
         require(_endTime > _startTime, "End time must be after start time");
 
@@ -99,6 +131,10 @@ contract TxocoCalPadri is ERC1155, Ownable {
     }
 
 
+    /**
+     * @notice Allows an administrator to close a proposal.
+     * @param _proposalId The ID of the proposal to be closed.
+     */
     function closeProposal(uint256 _proposalId) external onlyAdministrator {
         require(_proposalId < proposalCount, "Proposal does not exist");
         require(proposals[_proposalId].active, "Proposal is already closed");
@@ -109,6 +145,11 @@ contract TxocoCalPadri is ERC1155, Ownable {
     }
 
 
+    /**
+     * @notice Allows a member to vote on a proposal.
+     * @param _proposalId The ID of the proposal to vote on.
+     * @param _selectedOption The index of the selected option.
+     */
     function vote(uint256 _proposalId, uint256 _selectedOption) external {
         require(balanceOf(msg.sender, 0) > 0, "Must be a member to vote");
         require(proposals[_proposalId].active, "Proposal is not active");
@@ -131,13 +172,22 @@ contract TxocoCalPadri is ERC1155, Ownable {
     }
 
 
+    /**
+     * @notice Get the vote counts for each option in a proposal.
+     * @param _proposalId The ID of the proposal.
+     * @return An array containing the vote counts for each option.
+     */
     function getOptionVoteCounts(uint256 _proposalId) external view returns (uint256[] memory) {
         return proposals[_proposalId].optionVoteCounts;
     }
 
 
     /**
-     * It returns the winning option, its name and its number of votes
+     * @notice Get the winning option for a proposal.
+     * @param _proposalId The ID of the proposal.
+     * @return winningOption The index of the winning option.
+     * @return optionName The name of the winning option.
+     * @return voteCount The vote count of the winning option.
      */
     function getWinningOption(uint256 _proposalId) external view returns (uint256 winningOption, string memory optionName, uint256 voteCount) {
         uint256[] memory counts = proposals[_proposalId].optionVoteCounts;
@@ -158,7 +208,7 @@ contract TxocoCalPadri is ERC1155, Ownable {
 
 
     /**
-     * Membership of the association is not transferable.
+     * @notice Overrides safeTransferFrom function to only allow administrators to transfer tokens.
      */
     function safeTransferFrom(address _from, address _to, uint256 _id, uint256 _value, bytes memory _data) public override {
         require(administrators[msg.sender] || msg.sender == address(this), "Only administrators can transfer tokens");
@@ -166,6 +216,9 @@ contract TxocoCalPadri is ERC1155, Ownable {
     }
 
 
+    /**
+     * @notice Overrides safeBatchTransferFrom function to only allow administrators to transfer tokens.
+     */
     function safeBatchTransferFrom(address _from, address _to, uint256[] memory _ids, uint256[] memory _values, bytes memory _data) public override {
         require(administrators[msg.sender] || msg.sender == address(this), "Only administrators can transfer tokens");
         super.safeBatchTransferFrom(_from, _to, _ids, _values, _data);
