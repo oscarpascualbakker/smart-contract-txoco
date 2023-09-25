@@ -1,12 +1,20 @@
 // SPDX-License-Identifier: MIT
-pragma solidity >=0.8.0 <0.9.0;
+pragma solidity ^0.8.18;
 
 import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 
 
 contract TxocoCalPadri is ERC1155 {
 
-    address public owner;
+    // Variables 'name', 'symbol' and 'collectionName', which are not used throughout the entire contract,
+    // are used by some wallets to name the collections.
+    string public constant name = "Txoco Cal Padri";
+    string public constant symbol = "TCP";
+    string public collectionName = "Txoco Cal Padri";
+
+    address public immutable owner;
+
+    mapping(address => bool) public administrators;
 
     struct Proposal {
         string title;
@@ -15,13 +23,11 @@ contract TxocoCalPadri is ERC1155 {
         uint256 startTime;
         uint256 endTime;
         bool active;
-        uint256[] optionVoteCounts; // Additional array to keep a count of votes per option
-        mapping(address => uint256) votes; // Maps voter's address to selected option index
+        uint256[] optionVoteCounts;         // Additional array to keep a count of votes per option
+        mapping(address => uint256) votes;  // Maps voter's address to selected option index
     }
 
-    mapping(address => bool) public administrators;
     mapping(uint256 => Proposal) public proposals;
-    mapping(uint256 => string) private _tokenURIs;
     uint256 public proposalCount = 0;
     uint256 public activeProposalCount = 0;
     string public baseURI;
@@ -90,8 +96,10 @@ contract TxocoCalPadri is ERC1155 {
      */
     function mintNFT(address _to) external onlyAdministrator {
         require(balanceOf(_to, 0) == 0, "Address already owns the NFT");
-        _mint(_to, 0, 1, "");
+
         emit NFTMinted(_to);
+
+        _mint(_to, 0, 1, "");
     }
 
 
@@ -106,14 +114,15 @@ contract TxocoCalPadri is ERC1155 {
 
 
     /**
-     * @notice Allows an administrator to create a new proposal.
+     * @notice Allows any member of the DAO to create a new proposal.
      * @param _title The title of the proposal.
      * @param _description The description of the proposal.
      * @param _options The options for the proposal.
      * @param _startTime The start time of the proposal.
      * @param _endTime The end time of the proposal.
      */
-    function createProposal(string memory _title, string memory _description, string[] memory _options, uint256 _startTime, uint256 _endTime) external onlyAdministrator {
+    function createProposal(string memory _title, string memory _description, string[] memory _options, uint256 _startTime, uint256 _endTime) external {
+        require(balanceOf(msg.sender, 0) > 0, "Must be a member to create a proposal");
         require(_endTime > _startTime, "End time must be after start time");
 
         proposals[proposalCount].title = _title;
