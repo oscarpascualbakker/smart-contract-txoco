@@ -12,6 +12,23 @@ contract("TxocoCalPadri", accounts => {
     let contract;
 
 
+
+    // async function increaseTime(seconds) {
+    //     await web3.currentProvider.send({
+    //         jsonrpc: "2.0",
+    //         method: "evm_increaseTime",
+    //         params: [seconds],
+    //         id: new Date().getTime()
+    //     });
+
+    //     await web3.currentProvider.send({
+    //         jsonrpc: "2.0",
+    //         method: "evm_mine",
+    //         id: new Date().getTime()
+    //     });
+    // }
+
+
     before(async () => {
         contract = await TxocoCalPadri.deployed();
         await contract.mintNFT(owner, { from: owner });
@@ -97,9 +114,8 @@ contract("TxocoCalPadri", accounts => {
         });
 
         it("should not allow non-administrator to revoke NFT from a member", async () => {
-            const nonAdmin = accounts[3];
             await truffleAssert.reverts(
-                contract.revokeNFT(member, { from: nonAdmin }),
+                contract.revokeNFT(admin, { from: member }),
                 "You are not an administrator"
             );
         });
@@ -110,7 +126,7 @@ contract("TxocoCalPadri", accounts => {
         it("should create a proposal", async () => {
             const options = ["Option1", "Option2"];
             await contract.mintNFT(member, { from: admin });
-            const result = await contract.createProposal("Test", "Test proposal", options, Math.floor(Date.now() / 1000), Math.floor(Date.now() / 1000) + 600, { from: member });
+            const result = await contract.createProposal("Test", "Test proposal", options, Math.floor(Date.now() / 1000), Math.floor(Date.now() / 1000) + 60000, { from: member });
             truffleAssert.eventEmitted(result, 'ProposalCreated');
         });
 
@@ -142,11 +158,17 @@ contract("TxocoCalPadri", accounts => {
             await contract.createProposal("Test", "Test proposal", options, Math.floor(Date.now() / 1000), Math.floor(Date.now() / 1000) + 600, { from: member });
 
             // Option 0 was voted on previous test...
-            // await contract.vote(0, 0, { from: admin });
             const result = await contract.getWinningOption(0, { from: admin });
             assert.equal(result.winningOption, 0, "Failed to get the correct winning option");
             assert.equal(result.optionName, "Option1", "Failed to get the correct option name");
             assert.equal(result.voteCount.toNumber(), 1, "Failed to get the correct vote count");
+        });
+
+        it("should return the winning option", async () => {
+            const { winningOption, optionName, voteCount } = await contract.getWinningOption(0);
+            assert.equal(winningOption.toNumber(), 0);
+            assert.equal(optionName, "Option1");
+            assert.equal(voteCount.toNumber(), 1);
         });
     });
 
@@ -162,14 +184,40 @@ contract("TxocoCalPadri", accounts => {
     });
 
 
+    describe("safeBatchTransferFrom", () => {
+        it("should not allow non-admin to batch transfer", async () => {
+            await truffleAssert.reverts(contract.safeBatchTransferFrom(owner, nonMember, [0], [1], "0x0", { from: member }), "Only administrators can transfer tokens");
+        });
+    });
 
-    // function uri(uint256 tokenId) public view override returns (string memory) {
+
+    describe("getOptionVoteCounts", () => {
+        // There is already 1 vote!  See test: "should allow member to vote"
+        it("should return vote counts for options", async () => {
+            const optionVoteCounts = await contract.getOptionVoteCounts(0);
+            assert.deepEqual(optionVoteCounts.map(x => x.toNumber()), [1, 0]);
+        });
+
+        it("should reflect vote counts after a vote", async () => {
+            await contract.vote(0, 0, {from: admin});
+            const optionVoteCounts = await contract.getOptionVoteCounts(0);
+            assert.deepEqual(optionVoteCounts.map(x => x.toNumber()), [2, 0]);
+        });
+    });
+
+
+
+
+
     // function closeProposal(uint256 _proposalId) external onlyAdministrator {
-    // function getOptionVoteCounts(uint256 _proposalId) external view returns (uint256[] memory) {
-    // function getWinningOption(uint256 _proposalId) external view returns (uint256 winningOption, string memory optionName, uint256 voteCount) {
-    // function safeBatchTransferFrom(address _from, address _to, uint256[] memory _ids, uint256[] memory _values, bytes memory _data) public override {
 
 
+    // it("should not close an already closed proposal", async () => {
+    //     await contract.createProposal("Test Proposal", "Description", ["Option1", "Option2"], Math.floor(Date.now() / 1000), Math.floor(Date.now() / 1000) + 60000, {from: owner});
+    //     await delay(5000);
+    //     await contract.closeProposal(0, {from: owner});
+    //     await truffleAssert.reverts(contract.closeProposal(0, {from: owner}), "Proposal is already closed");
+    // });
 
 
 
@@ -184,57 +232,27 @@ contract("TxocoCalPadri", accounts => {
     // });
 
 
+    // describe("closeProposal", function() {
+    //     it("should close an active proposal", async function() {
 
+    //         const currentTime = Math.floor(Date.now() / 1000);
+    //         const startTime = currentTime;
+    //         const endTime = currentTime + 1000; // Termina en 1000 segundos
 
+    //         await contract.createProposal("Test Proposal", "Description", ["Option1", "Option2"], startTime, endTime, { from: admin });
 
-    // it("should not close an already closed proposal", async () => {
-    //     await contract.createProposal("Test Proposal", "Description", ["Option1", "Option2"], Math.floor(Date.now() / 1000), Math.floor(Date.now() / 1000) + 60000, {from: owner});
-    //     await delay(5000);
-    //     await contract.closeProposal(0, {from: owner});
-    //     await truffleAssert.reverts(contract.closeProposal(0, {from: owner}), "Proposal is already closed");
+    //         // Aumenta el tiempo en 1001 segundos, lo que hace que la propuesta expire
+    //         await web3.currentProvider.send("evm_increaseTime", [1001]);
+    //         await web3.currentProvider.send("evm_mine");
+    //         // await increaseTime(1001);
+
+    //         // Cierra la propuesta
+    //         await contract.closeProposal(0, { from: admin });
+
+    //         const proposal = await contract.proposals(0);
+    //         expect(proposal.active).to.equal(false);
+    //     });
     // });
-
-
-
-    // // getOptionVoteCounts tests
-    // it("should return vote counts for options", async () => {
-    //     await contract.createProposal("Test Proposal", "Description", ["Option1", "Option2"], Math.floor(Date.now() / 1000), Math.floor(Date.now() / 1000) + 60000, {from: owner});
-    //     const optionVoteCounts = await contract.getOptionVoteCounts(0);
-    //     assert.deepEqual(optionVoteCounts.map(x => x.toNumber()), [0, 0]);
-    // });
-
-    // it("should reflect vote counts after a vote", async () => {
-    //     await contract.createProposal("Test Proposal", "Description", ["Option1", "Option2"], Math.floor(Date.now() / 1000), Math.floor(Date.now() / 1000) + 60000, {from: owner});
-    //     await contract.vote(0, 0, {from: owner});
-    //     const optionVoteCounts = await contract.getOptionVoteCounts(0);
-    //     assert.deepEqual(optionVoteCounts.map(x => x.toNumber()), [1, 0]);
-    // });
-
-    // // getWinningOption tests
-    // it("should return the winning option", async () => {
-    //     await contract.createProposal("Test Proposal", "Description", ["Option1", "Option2"], Math.floor(Date.now() / 1000), Math.floor(Date.now() / 1000) + 60000, {from: owner});
-    //     await contract.vote(0, 0, {from: owner});
-    //     const { winningOption, optionName, voteCount } = await contract.getWinningOption(0);
-    //     assert.equal(winningOption.toNumber(), 0);
-    //     assert.equal(optionName, "Yes");
-    //     assert.equal(voteCount.toNumber(), 1);
-    // });
-
-    // // safeBatchTransferFrom test
-    // it("should not allow non-admin to batch transfer", async () => {
-    //     await truffleAssert.reverts(contract.safeBatchTransferFrom(owner, nonMember, [0], [1], "0x0", { from: nonAdmin }), "Only administrators can transfer tokens");
-    // });
-
-
-
-
-
-
-
-
-
-
-
 
 
 
