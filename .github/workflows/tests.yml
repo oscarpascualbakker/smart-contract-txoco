@@ -25,9 +25,9 @@ jobs:
     # Run unit tests (forcing compilation)
     - name: Run tests
       run: |
-       docker compose run --rm --user root castells mkdir -p /app/build
-       docker compose run --rm castells chown -R node:node /app/build
-       docker compose run --rm castells truffle test --compile-all
+       docker compose run --rm --user root txoco mkdir -p /app/build
+       docker compose run --rm txoco chown -R node:node /app/build
+       docker compose run --rm txoco truffle test --compile-all
 
     # Execute Slither for smart contract analysis
     - name: Run Slither
