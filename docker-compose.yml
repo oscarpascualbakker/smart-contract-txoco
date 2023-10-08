@@ -1,15 +1,36 @@
-version: '3'
+version: '3.8'
+
 services:
   ganache:
     image: trufflesuite/ganache-cli
     ports:
       - "8545:8545"
+    container_name: TxocoCalPadri_Ganache
+    networks:
+      - TxocoCalPadri
 
   txoco:
     build: .
     volumes:
       - .:/app
       - /app/node_modules
+    container_name: TxocoCalPadri_Txoco
     command: /bin/sh
     depends_on:
       - ganache
+    networks:
+      - TxocoCalPadri
+
+  slither:
+    build:
+      context: .
+      dockerfile: Dockerfile.slither
+    container_name: TxocoCalPadri_Slither
+    volumes:
+      - .:/slither
+    networks:
+      - TxocoCalPadri
+
+networks:
+  TxocoCalPadri:
+    driver: bridge
