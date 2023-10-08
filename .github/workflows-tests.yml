@@ -27,6 +27,7 @@ jobs:
       run: |
        docker compose run --rm --user root txoco mkdir -p /app/build
        docker compose run --rm txoco chown -R node:node /app/build
+       docker compose run --rm txoco npm install web3
        docker compose run --rm txoco truffle test --compile-all
 
     # Execute Slither for smart contract analysis
