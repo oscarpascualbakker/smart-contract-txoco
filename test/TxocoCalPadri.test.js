@@ -63,7 +63,7 @@ contract("TxocoCalPadri", accounts => {
         it("should initialize with correct base URI", async () => {
             const tokenId = 0;
             const fullURI = await contract.uri(tokenId);
-            const baseURI = 'https://oscarpascual.com/txococalpadri/metadata.json';
+            const baseURI = 'https://oscarpascual.com/txococalpadri/';
 
             assert.include(fullURI, baseURI, "Failed to initialize with correct base URI");
         });

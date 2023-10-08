@@ -1,14 +1,26 @@
 # Dependency directory
 node_modules
 
-# Build directory
-build/
-
 # Environment variables
 .env
 
 # Metadata
-metadata.json
+metadata/
+
+# Images
+images/
+
+# Log files
+npm-debug.log
+yarn-error.log
+
+# Directory for deployed contracts, not needed in version control
+deployed/
+
+# Build, Cache & Artifacts
+cache/
+artifacts/
+build/
 
 # System files
 .DS_Store
@@ -18,13 +30,3 @@ Thumbs.db
 .idea/
 *.iml
 
-# Log files
-npm-debug.log
-yarn-error.log
-
-# Directory for deployed contracts, not needed in version control
-deployed/
-
-# Cache & Artifacts
-cache/
-artifacts/

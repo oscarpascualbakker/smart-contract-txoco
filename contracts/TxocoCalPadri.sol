@@ -54,7 +54,7 @@ contract TxocoCalPadri is ERC1155 {
     constructor() ERC1155("") {
         owner = msg.sender;
         administrators[msg.sender] = true; // The contract deployer is the first administrator
-        baseURI = "https://oscarpascual.com/txococalpadri/metadata.json";
+        baseURI = "https://oscarpascual.com/txococalpadri/";
         _setURI(baseURI);
     }
 
