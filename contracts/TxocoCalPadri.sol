@@ -32,9 +32,10 @@ contract TxocoCalPadri is ERC1155 {
     uint256 public activeProposalCount = 0;
     string public baseURI;
 
+    event NFTMinted(address to, uint256 id);
     event ProposalCreated(uint256 proposalId, string title, uint256 startTime, uint256 endTime);
     event Voted(uint256 proposalId, address voter, uint256 selectedOption);
-    event NFTMinted(address to, uint256 id);
+    event ProposalClosed(uint256 proposalId);
 
 
     modifier onlyOwner() {
@@ -182,6 +183,8 @@ contract TxocoCalPadri is ERC1155 {
 
         proposals[_proposalId].active = false;
         activeProposalCount = activeProposalCount > 0 ? activeProposalCount - 1 : 0;
+
+        emit ProposalClosed(_proposalId);
     }
 
 

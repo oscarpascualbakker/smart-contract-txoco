@@ -72,10 +72,14 @@ contract("TxocoCalPadri", accounts => {
 
     describe("setBaseURI", () => {
         it("should allow owner to change base URI", async () => {
+            const previousBaseURI = await contract.baseURI();
             const newBaseURI = 'https://newbaseuri.example.com/';
             await contract.setBaseURI(newBaseURI, { from: owner });
             const baseURI = await contract.uri(0);
             assert.equal(baseURI, newBaseURI + "metadata-0.json", "Failed to set new base URI");
+
+            // Reset previous baseURI for further testing
+            await contract.setBaseURI(previousBaseURI, { from: owner });
         });
 
         it("should not allow non-owner to change base URI", async () => {
@@ -261,6 +265,36 @@ contract("TxocoCalPadri", accounts => {
 
             const proposal = await contract.proposals(2);
             expect(proposal.active).to.equal(false);
+        });
+    });
+
+
+    describe("uri", function() {
+        it('should return correct URI for token id 0', async () => {
+            const tokenId = 0;
+            const expectedURI = 'https://oscarpascual.com/txococalpadri/metadata-0.json';
+
+            const fullURI = await contract.uri(tokenId);
+
+            assert.equal(fullURI, expectedURI);
+        });
+
+        it('should return correct URI for existing NFT', async () => {
+            const tokenId = 4;
+            const expectedURI = 'https://oscarpascual.com/txococalpadri/metadata-4.json';
+
+            const fullURI = await contract.uri(tokenId);
+
+            assert.equal(fullURI, expectedURI);
+        });
+
+        it('should return correct URI for non-existing, high token ids', async () => {
+            const tokenId = 10000;
+            const expectedURI = 'https://oscarpascual.com/txococalpadri/metadata-10000.json';
+
+            const fullURI = await contract.uri(tokenId);
+
+            assert.equal(fullURI, expectedURI);
         });
     });
 
