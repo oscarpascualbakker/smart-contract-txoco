@@ -21,23 +21,29 @@ Currently, there are 6 different NFTs issued: One for membership, another for an
 
 ### Membership
 ![Member](https://oscarpascual.com/txococalpadri/thumb-txococalpadri.png)
+<br>
 *This NFT certifies that the owner is a member of Txoco Cal Padrí*
 
 ### Membership Tenure
 ![1 Year Tenure](https://oscarpascual.com/txococalpadri/thumb-txococalpadri-membership-tenure-1.png)
+<br>
 *This NFT represents 1 year of membership*
 
 ![2 Years Tenure](https://oscarpascual.com/txococalpadri/thumb-txococalpadri-membership-tenure-2.png)
+<br>
 *This NFT represents 2 years of membership*
 
 ![3 Years Tenure](https://oscarpascual.com/txococalpadri/thumb-txococalpadri-membership-tenure-3.png)
+<br>
 *This NFT represents 3 years of membership*
 
 ![4 Years Tenure](https://oscarpascual.com/txococalpadri/thumb-txococalpadri-membership-tenure-4.png)
+<br>
 *This NFT represents 4 years of membership*
 
 ### Special Events
 ![Basque Country March 2023](https://oscarpascual.com/txococalpadri/thumb-txococalpadri.png)
+<br>
 *This NFT certifies that the owner participated in the trip to the Basque Country in March 2023*
 
 And of course, there are more to come!
