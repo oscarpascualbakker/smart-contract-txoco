@@ -6,12 +6,42 @@ TxocoCalPadri is a smart contract written in Solidity for the Ethereum Virtual M
 
 ![Solidity 0.8.18](https://img.shields.io/badge/Solidity-0.8.18-blue) ![Truffle 5.11.4](https://img.shields.io/badge/Truffle-5.11.4-blue) ![Ganache 7.9.1](https://img.shields.io/badge/Ganache-7.9.1-blue) ![Node 16.20.2](https://img.shields.io/badge/Node-16.20.2-blue) ![Slither 0.9.6](https://img.shields.io/badge/Slither-0.9.6-blue)
 
+
 ## Features
 
 - Issuance and revocation of NFTs for members
 - NFTs are non-transferable by members, only administrators can transfer them as membership is non-transferable
 - Creation and management of proposals with voting options
 - Members can vote on active proposals
+
+
+## Current NFTs
+
+Currently, there are 6 different NFTs issued: One for membership, another for an exchange trip to the Basque Country, and four for membership tenure. They are as follows:
+
+### Membership
+![Member](https://oscarpascual.com/txococalpadri/thumb-txococalpadri.png)
+*This NFT certifies that the owner is a member of Txoco Cal Padrí*
+
+### Membership Tenure
+![1 Year Tenure](https://oscarpascual.com/txococalpadri/thumb-txococalpadri-membership-tenure-1.png)
+*This NFT represents 1 year of membership*
+
+![2 Years Tenure](https://oscarpascual.com/txococalpadri/thumb-txococalpadri-membership-tenure-2.png)
+*This NFT represents 2 years of membership*
+
+![3 Years Tenure](https://oscarpascual.com/txococalpadri/thumb-txococalpadri-membership-tenure-3.png)
+*This NFT represents 3 years of membership*
+
+![4 Years Tenure](https://oscarpascual.com/txococalpadri/thumb-txococalpadri-membership-tenure-4.png)
+*This NFT represents 4 years of membership*
+
+### Special Events
+![Basque Country March 2023](https://oscarpascual.com/txococalpadri/thumb-txococalpadri.png)
+*This NFT certifies that the owner participated in the trip to the Basque Country in March 2023*
+
+And of course, there are more to come!
+
 
 ## Functions
 
@@ -72,6 +102,7 @@ Overrides safeTransferFrom function from ERC1155 contract. Used to safely transf
 ##### `safeBatchTransferFrom(address _from, address _to, uint256[] memory _ids, uint256[] memory _values, bytes memory _data)`
 
 Overrides safeBatchTransferFrom from ERC1155 contract. Used to perform batch transfer of multiple tokens between addresses. Modified to only allow administrators to transfer tokens.
+
 
 ## Testing
 
